@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SDataReference xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Uris>
+    <string>http://localhost:5493/sdata/Accounts50/GCRM/-/$schema</string>
+    <string>http://localhost:5493/sdata/accounts50/GCRM/-/$schema/$schema?namespace=http://schemas.sage.com/sc/2009</string>
+  </Uris>
+  <Files />
+  <Name>Accounts50</Name>
+</SDataReference>
