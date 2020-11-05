@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CreatePurchaseOrder</RootNamespace>
     <AssemblyName>CreatePurchaseOrder</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,21 +33,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Sage.Common.Syndication, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c59b718b5ca510a8, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Sage\Assemblies\SData\Sage.Common.Syndication.dll</HintPath>
+    <Reference Include="Sage.Common.Syndication">
+      <HintPath>..\Dependencies\SIF\Sage.Common.Syndication.dll</HintPath>
     </Reference>
-    <Reference Include="Sage.Integration.Client, Version=1.0.0.0, Culture=neutral, PublicKeyToken=3f422f0ff54abde1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Sage\Assemblies\SData\Sage.Integration.Client.dll</HintPath>
+    <Reference Include="Sage.Integration.Client">
+      <HintPath>..\Dependencies\SIF\Sage.Integration.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Sage.Integration.Server.Model, Version=1.0.0.0, Culture=neutral, PublicKeyToken=3f422f0ff54abde1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Sage\Assemblies\SData\Sage.Integration.Server.Model.dll</HintPath>
+    <Reference Include="Sage.Integration.Server.Model">
+      <HintPath>..\Dependencies\SIF\Sage.Integration.Server.Model.dll</HintPath>
     </Reference>
-    <Reference Include="Sage.Utilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c59b718b5ca510a8, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Sage\Assemblies\SData\Sage.Utilities.dll</HintPath>
+    <Reference Include="Sage.Utilities">
+      <HintPath>..\Dependencies\SIF\Sage.Utilities.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,6 +65,10 @@
       <Project>{025d396f-e0d5-4415-96bb-d0c8f61d897e}</Project>
       <Name>FeedModel</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

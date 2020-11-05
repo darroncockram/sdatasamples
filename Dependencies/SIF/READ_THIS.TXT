@@ -1,0 +1,1 @@
+The files in this folder are not for redistribution. Please use the SIFSetup .NET 4.5.msi installer for redistribution only.
