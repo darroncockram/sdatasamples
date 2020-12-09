@@ -138,6 +138,7 @@ namespace Sage.crmErp.x2008.Feeds
 		private Nullable<System.Decimal> _settlementDiscountAmount;
 		private Nullable<System.Decimal> _settlementDiscountPercent;
 		private System.String _settlementDiscountTerms;
+		private System.String _tradingTerms;
 		private System.String _settlementDiscountTermsCommencement;
 		private Nullable<System.Boolean> _settlementDiscountIncludedInTotal;
 		private System.String _paymentTerms;
@@ -330,7 +331,14 @@ namespace Sage.crmErp.x2008.Feeds
 
 		[SMEStringProperty(Label="TradingAccount Settlement Discount Terms", Name="settlementDiscountTerms", Namespace="http://schemas.sage.com/crmErp/2008", DataType="string", CanFilter=true)]			
 		public virtual System.String settlementDiscountTerms { get { return _settlementDiscountTerms; } set { SetProperty(PropertysettlementDiscountTerms, ref _settlementDiscountTerms, value); } }
-		
+
+		/// <summary>
+		/// Manually added property a the instance schema is not returning it despite it actually being available
+		/// See https://github.com/Sage/SData-2.0/issues/165
+		/// </summary>
+		[SMEStringProperty(Label = "TradingAccount Trading Terms", Name = "tradingTerms", Namespace = "http://schemas.sage.com/crmErp/2008", DataType = "string", CanFilter = true)]
+		public virtual System.String tradingTerms { get { return _tradingTerms; } set { SetProperty(PropertysettlementDiscountTerms, ref _tradingTerms, value); } }
+
 		/// <summary>
 		/// This property is not supported by the SData provider.
 		/// </summary>
