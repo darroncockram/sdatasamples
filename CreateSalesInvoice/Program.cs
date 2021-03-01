@@ -5,6 +5,7 @@ using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
 using System.Linq;
+using Helpers;
 
 namespace CreateSalesInvoice
 {
@@ -12,14 +13,8 @@ namespace CreateSalesInvoice
 	{
 		static void Main(string[] args)
 		{
-			Console.WriteLine("Enter the user name to connect to the data (default is MANAGER):");
-			string userName = Console.ReadLine();
-			if (String.IsNullOrEmpty(userName))
-			{
-				userName = "MANAGER";
-			}
-
-			string password = GetPassword();
+			string userName = Authentication.GetUserName();
+			string password = Authentication.GetPassword();
 
 			// Create a new instance of a salesInvoice
 			salesInvoiceFeedEntry salesInvoice = new salesInvoiceFeedEntry
@@ -191,22 +186,6 @@ namespace CreateSalesInvoice
 			}
 
 			Console.ReadKey(true);
-		}
-
-		private static string GetPassword()
-		{
-			Console.WriteLine($"Enter the password for the above user");
-			var password = "";
-			ConsoleKeyInfo ch = Console.ReadKey(true);
-			while (ch.Key != ConsoleKey.Enter)
-			{
-				password += ch.KeyChar;
-				Console.Write('*');
-				ch = Console.ReadKey(true);
-			}
-			Console.WriteLine();
-
-			return password;
 		}
 
 		static tradingAccountFeedEntry GetCustomer(string userName, string password)

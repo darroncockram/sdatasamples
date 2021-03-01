@@ -1,3 +1,4 @@
+using Helpers;
 using Sage.Common.Syndication;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,9 @@ namespace GetInstanceSchema
     {
         static void Main(string[] args)
         {
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             // Build the request URI. This example assumes that the Accounts 50 GCRM contract implementation is available
             SDataUri uri = new SDataUri();
             uri.BuildLocalPath("Accounts50", "GCRM", "-", "$schema");
@@ -19,8 +23,8 @@ namespace GetInstanceSchema
             {
                 ResponseContentType = Sage.Common.Syndication.MediaType.Xml,
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             // Out parameters for Send method

@@ -4,6 +4,7 @@ using System.Text;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Common.Syndication;
 using Sage.Integration.Client;
+using Helpers;
 
 namespace GetTradingAccountUUIDs
 {
@@ -11,6 +12,9 @@ namespace GetTradingAccountUUIDs
     {
         static void Main(string[] args)
         {
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             // Create a new instance of an endpoint feed.
             tradingAccountFeed feed = new tradingAccountFeed();
 
@@ -29,8 +33,8 @@ namespace GetTradingAccountUUIDs
             SDataRequest request = new SDataRequest(uri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             // Submit the request for trading accounts

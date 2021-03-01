@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml.Schema;
 using System.Xml;
 using Sage.Common.Syndication;
+using Helpers;
 
 namespace DetermineCapabilities
 {
@@ -11,20 +12,23 @@ namespace DetermineCapabilities
     {
         static void Main(string[] args)
         {
-            // Build the request URI. This example assumes that the Accounts 50 GCRM contract implementation is available
-            SDataUri uri = new SDataUri();
+			string userName = Authentication.GetUserName();
+			string password = Authentication.GetPassword();
+
+			// Build the request URI. This example assumes that the Accounts 50 GCRM contract implementation is available
+			SDataUri uri = new SDataUri();
             uri.BuildLocalPath("Accounts50", "GCRM", "-", "$schema");
 
 			// The response was successful. The stream should now contain the xml schema
 			XmlSchemaSet schemaSet = new XmlSchemaSet();
-			XmlSchema schema = GetSchema(uri.Uri);
+			XmlSchema schema = GetSchema(uri.Uri, userName, password);
 
 			if (schema != null)
 				schemaSet.Add(schema);
 
 			foreach (XmlSchemaImport importedSchema in schema.Includes)
 			{
-				schema = GetSchema(new Uri(importedSchema.SchemaLocation));
+				schema = GetSchema(new Uri(importedSchema.SchemaLocation), userName, password);
 
                 if (schema != null)
                 {
@@ -63,7 +67,7 @@ namespace DetermineCapabilities
             Console.WriteLine(string.Format("Invalid schema ({0})", e.Message));
         }
 
-		static XmlSchema GetSchema(Uri schemaUri)
+		static XmlSchema GetSchema(Uri schemaUri, string userName, string password)
 		{
 			XmlSchema schema = null;
 
@@ -76,8 +80,8 @@ namespace DetermineCapabilities
             {
                 ResponseContentType = MediaType.Xml,
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             request.Send(out serializer, out stream);

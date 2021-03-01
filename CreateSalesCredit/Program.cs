@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Helpers;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
@@ -14,6 +15,9 @@ namespace CreateServiceCredit
 
 		static void Main(string[] args)
 		{
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             // Create a new instance of a salesCredit
             salesCreditFeedEntry salesCredit = new salesCreditFeedEntry
             {
@@ -21,7 +25,7 @@ namespace CreateServiceCredit
                 type = "Service Credit",
 
                 // Find a customer to associate with the new sales Credit
-                tradingAccount = GetCustomer()
+                tradingAccount = GetCustomer(userName, password)
             };
 
             if (salesCredit.tradingAccount == null)
@@ -64,7 +68,7 @@ namespace CreateServiceCredit
 			salesCreditUri.Host = HOST_NAME;
             SDataRequest CreditRequest = new SDataRequest(salesCreditUri.Uri, salesCredit, Sage.Integration.Messaging.Model.RequestVerb.POST)
             {
-                Username = "MANAGER",
+                Username = userName,
                 Password = "1"
             };
 
@@ -90,7 +94,7 @@ namespace CreateServiceCredit
 			Console.ReadKey(true);
 		}
 
-		static tradingAccountFeedEntry GetCustomer()
+		static tradingAccountFeedEntry GetCustomer(string userName, string password)
 		{
 			// Look up the first customer record 
 			SDataUri accountUri = new SDataUri();
@@ -102,8 +106,8 @@ namespace CreateServiceCredit
             SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = "1"
+                Username = userName,
+                Password = password
             };
 
             tradingAccountFeed accounts = new tradingAccountFeed();

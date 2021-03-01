@@ -4,6 +4,7 @@ using System.Text;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Common.Syndication;
 using Sage.Integration.Client;
+using Helpers;
 
 namespace QueryForTradingAccount
 {
@@ -11,6 +12,9 @@ namespace QueryForTradingAccount
     {
         static void Main(string[] args)
         {
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             Console.Write("Please enter a reference to search for: ");
             string search = Console.ReadLine();
 
@@ -27,8 +31,8 @@ namespace QueryForTradingAccount
             SDataRequest request = new SDataRequest(uri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             // Submit the request for trading accounts

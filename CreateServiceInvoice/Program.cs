@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Helpers;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
@@ -12,6 +13,9 @@ namespace CreateServiceInvoice
 	{
 		static void Main(string[] args)
 		{
+			string userName = Authentication.GetUserName();
+			string password = Authentication.GetPassword();
+
 			// Create a new instance of a salesInvoice
 			salesInvoiceFeedEntry salesInvoice = new salesInvoiceFeedEntry
 			{
@@ -19,7 +23,7 @@ namespace CreateServiceInvoice
 				type = "Service Invoice",
 
 				// Find a customer to associate with the new sales invoice
-				tradingAccount = GetCustomer()
+				tradingAccount = GetCustomer(userName, password)
 			};
 
 			if (salesInvoice.tradingAccount == null)
@@ -61,8 +65,8 @@ namespace CreateServiceInvoice
 			salesInvoiceUri.BuildLocalPath("Accounts50", "GCRM", "-", "salesInvoices");
 			SDataRequest invoiceRequest = new SDataRequest(salesInvoiceUri.Uri, salesInvoice, Sage.Integration.Messaging.Model.RequestVerb.POST)
 			{
-				Username = "MANAGER",
-				Password = ""
+				Username = userName,
+				Password = password
 			};
 
 			// IF successful the POST operation will provide us with a the newly created sales invoice
@@ -89,7 +93,7 @@ namespace CreateServiceInvoice
 			Console.ReadKey(true);
 		}
 
-		static tradingAccountFeedEntry GetCustomer()
+		static tradingAccountFeedEntry GetCustomer(string userName, string password)
 		{
 			// Look up the first customer record 
 			SDataUri accountUri = new SDataUri();
@@ -100,8 +104,8 @@ namespace CreateServiceInvoice
 			SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
 			{
 				AllowPromptForCredentials = false,
-				Username = "MANAGER",
-				Password = ""
+				Username = userName,
+				Password = password
 			};
 
 			tradingAccountFeed accounts = new tradingAccountFeed();

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscoverApplications", "DiscoverApplications\DiscoverApplications.csproj", "{EBA22593-E0A9-4BCA-8084-D27ED07CE3CF}"
 EndProject
@@ -45,7 +45,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatePurchaseOrder", "Crea
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateCommodity", "CreateCommodity\CreateCommodity.csproj", "{9D84A75B-BF8A-4799-AE0E-04132D6DA32F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddContct", "AddContct\AddContct.csproj", "{5EF8A325-16CB-4426-B94D-78CF85775D83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddContact", "AddContct\AddContact.csproj", "{5EF8A325-16CB-4426-B94D-78CF85775D83}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateSalesCredit", "CreateSalesCredit\CreateSalesCredit.csproj", "{189653BE-F6F6-48CA-ACBB-852AE26C183B}"
 EndProject
@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "Helpers\Helpers.csproj", "{6F4364FF-EA51-4FFC-96F0-A3354C380F2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,6 +154,10 @@ Global
 		{189653BE-F6F6-48CA-ACBB-852AE26C183B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{189653BE-F6F6-48CA-ACBB-852AE26C183B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{189653BE-F6F6-48CA-ACBB-852AE26C183B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F4364FF-EA51-4FFC-96F0-A3354C380F2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F4364FF-EA51-4FFC-96F0-A3354C380F2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F4364FF-EA51-4FFC-96F0-A3354C380F2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F4364FF-EA51-4FFC-96F0-A3354C380F2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

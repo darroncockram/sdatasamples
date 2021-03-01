@@ -1,4 +1,5 @@
-﻿using Sage.Common.Syndication;
+﻿using Helpers;
+using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
 using System;
@@ -13,6 +14,9 @@ namespace CreateCommodity
     {
         static void Main(string[] args)
         {
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             // Create a new instance of a trading account 
             commodityFeedEntry commodity = new commodityFeedEntry();
 
@@ -32,8 +36,8 @@ namespace CreateCommodity
             SDataRequest createRequest = new SDataRequest(uri.Uri, commodity, Sage.Integration.Messaging.Model.RequestVerb.POST)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             // Submit the create request

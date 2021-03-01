@@ -4,6 +4,7 @@ using System.Text;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
 using Sage.Common.Syndication;
+using Helpers;
 
 namespace CreateTradingAccount
 {
@@ -11,6 +12,9 @@ namespace CreateTradingAccount
     {
         static void Main(string[] args)
         {
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             // Create a new instance of a trading account 
             tradingAccountFeedEntry account = new tradingAccountFeedEntry();
             
@@ -32,8 +36,8 @@ namespace CreateTradingAccount
             SDataRequest createRequest = new SDataRequest(uri.Uri, account, Sage.Integration.Messaging.Model.RequestVerb.POST)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             // Submit the create request

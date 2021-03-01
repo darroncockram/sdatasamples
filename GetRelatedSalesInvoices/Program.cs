@@ -4,6 +4,7 @@ using System.Text;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
 using Sage.Common.Syndication;
+using Helpers;
 
 namespace GetRelatedSalesInvoices
 {
@@ -11,8 +12,11 @@ namespace GetRelatedSalesInvoices
     {
         static void Main(string[] args)
         {
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             // Find a customer to associate with the new sales invoice
-            tradingAccountFeedEntry account = GetCustomer();
+            tradingAccountFeedEntry account = GetCustomer(userName, password);
 
             if (account == null)
             {
@@ -31,8 +35,8 @@ namespace GetRelatedSalesInvoices
             SDataRequest invoiceRequest = new SDataRequest(accountUri.Uri)
             {
                 AllowPromptForCredentials = false, // Do not show any UI
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             salesInvoiceFeed invoices = new salesInvoiceFeed();
@@ -66,7 +70,7 @@ namespace GetRelatedSalesInvoices
             Console.ReadKey(true);
         }
 
-        static tradingAccountFeedEntry GetCustomer()
+        static tradingAccountFeedEntry GetCustomer(string userName, string password)
         {
             // Look up the first customer record 
             SDataUri accountUri = new SDataUri();
@@ -76,8 +80,8 @@ namespace GetRelatedSalesInvoices
 
             SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             tradingAccountFeed accounts = new tradingAccountFeed();

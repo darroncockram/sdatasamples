@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Helpers;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 
@@ -10,6 +11,9 @@ namespace GetTradingAccountTemplate
     {
         static void Main(string[] args)
         {
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             // Create a new instance of a trading account this will be populated with default values
             tradingAccountFeedEntry templateAccount = new tradingAccountFeedEntry();
 
@@ -21,8 +25,8 @@ namespace GetTradingAccountTemplate
             Sage.Integration.Client.SDataRequest request = new Sage.Integration.Client.SDataRequest(uri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             // Submit the request for trading accounts

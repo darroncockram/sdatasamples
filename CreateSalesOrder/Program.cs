@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Helpers;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
@@ -12,11 +13,14 @@ namespace CreateSalesOrder
 	{
 		static void Main(string[] args)
 		{
-            // Create a new instance of a salesOrder
-            salesOrderFeedEntry salesOrder = new salesOrderFeedEntry
+			string userName = Authentication.GetUserName();
+			string password = Authentication.GetPassword();
+
+			// Create a new instance of a salesOrder
+			salesOrderFeedEntry salesOrder = new salesOrderFeedEntry
             {
                 // Find a customer to associate with the new sales Order
-                tradingAccount = GetCustomer()
+                tradingAccount = GetCustomer(userName, password)
             };
 
             if (salesOrder.tradingAccount == null)
@@ -28,7 +32,7 @@ namespace CreateSalesOrder
 			}
 
 			// Lookup a commodity to use on the new sales Order
-			commodityFeedEntry commodity = GetCommodity();
+			commodityFeedEntry commodity = GetCommodity(userName, password);
 			if (commodity == null)
 			{
 				// No commidty record means we go no further
@@ -42,7 +46,7 @@ namespace CreateSalesOrder
             };
 
             // Lookup a tax code to use on the new sales Order
-            taxCodeFeedEntry taxCode = GetTaxCode();
+            taxCodeFeedEntry taxCode = GetTaxCode(userName, password);
 			if (taxCode == null)
 			{
 				// No record means we go no further
@@ -109,7 +113,7 @@ namespace CreateSalesOrder
                 financialAccounts = new financialAccountFeed()
             };
             secondOrderLine.taxCodes.Entries.Add(taxReference);
-			secondOrderLine.financialAccounts.Entries.Add(GetFinancialAccount("1001"));
+			secondOrderLine.financialAccounts.Entries.Add(GetFinancialAccount("1001", userName, password));
 
 			// Associate the lines with our Order
 			salesOrder.salesOrderLines = new salesOrderLineFeed();
@@ -123,8 +127,8 @@ namespace CreateSalesOrder
 			salesOrderUri.Include = "salesOrderLines";
             SDataRequest OrderRequest = new SDataRequest(salesOrderUri.Uri, salesOrder, Sage.Integration.Messaging.Model.RequestVerb.POST)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             // IF successful the POST operation will provide us with a the newly created sales Order
@@ -149,7 +153,7 @@ namespace CreateSalesOrder
 			Console.ReadKey(true);
 		}
 
-		static tradingAccountFeedEntry GetCustomer()
+		static tradingAccountFeedEntry GetCustomer(string userName, string password)
 		{
 			// Look up the first customer record 
 			SDataUri accountUri = new SDataUri();
@@ -160,8 +164,8 @@ namespace CreateSalesOrder
             SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             tradingAccountFeed accounts = new tradingAccountFeed();
@@ -184,7 +188,7 @@ namespace CreateSalesOrder
 			}
 		}
 
-		static commodityFeedEntry GetCommodity()
+		static commodityFeedEntry GetCommodity(string userName, string password)
 		{
 			// Look up the first commodity (product) record 
 			SDataUri commodityUri = new SDataUri();
@@ -194,8 +198,8 @@ namespace CreateSalesOrder
 
             SDataRequest commodityRequest = new SDataRequest(commodityUri.Uri)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             commodityFeed commodities = new commodityFeed();
@@ -218,7 +222,7 @@ namespace CreateSalesOrder
 			}
 		}
 
-		static taxCodeFeedEntry GetTaxCode()
+		static taxCodeFeedEntry GetTaxCode(string userName, string password)
 		{
 			// Look up the tax code record 
 			SDataUri taxCodeUri = new SDataUri();
@@ -227,8 +231,8 @@ namespace CreateSalesOrder
 
             SDataRequest taxcodeRequest = new SDataRequest(taxCodeUri.Uri)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             taxCodeFeed taxcodes = new taxCodeFeed();
@@ -251,7 +255,7 @@ namespace CreateSalesOrder
 			}
 		}
 
-		static financialAccountFeedEntry GetFinancialAccount(string nominalCode)
+		static financialAccountFeedEntry GetFinancialAccount(string nominalCode, string userName, string password)
 		{
 			// Look up the tax code record 
 			SDataUri financialAccountUri = new SDataUri();
@@ -260,8 +264,8 @@ namespace CreateSalesOrder
 
             SDataRequest request = new SDataRequest(financialAccountUri.Uri)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             financialAccountFeed entries = new financialAccountFeed();

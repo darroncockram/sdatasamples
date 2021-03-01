@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using Helpers;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
@@ -19,13 +20,16 @@ namespace PriceCheck
 
 		private static void SendComputePriceRequest()
 		{
-            computePriceFeedEntry priceCheck = new computePriceFeedEntry
+			string userName = Authentication.GetUserName();
+			string password = Authentication.GetPassword();
+
+			computePriceFeedEntry priceCheck = new computePriceFeedEntry
             {
                 request = new computePriceRequestFeedEntry()
             };
 
             // Find the customer to check  prices for
-            tradingAccountFeedEntry account = GetCustomer();
+            tradingAccountFeedEntry account = GetCustomer(userName, password);
 			if (account == null)
 			{
 				Console.WriteLine("Unable to find a customer record");
@@ -33,7 +37,7 @@ namespace PriceCheck
 			}
 
 			// Lookup a commodity to check the price for
-			commodityFeedEntry commodity = GetCommodity();
+			commodityFeedEntry commodity = GetCommodity(userName, password);
 			if (commodity == null)
 			{
 				Console.WriteLine("Unable to find a commodity record");
@@ -59,8 +63,8 @@ namespace PriceCheck
 			computePriceUri.ServiceMethod = "ComputePrice";
             SDataRequest request = new SDataRequest(computePriceUri.Uri, (Sage.Common.Syndication.FeedEntry)priceCheck, RequestVerb.POST)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             computePriceFeedEntry computePriceResult = new computePriceFeedEntry();
@@ -86,7 +90,7 @@ namespace PriceCheck
 			}
 		}
 
-		static tradingAccountFeedEntry GetCustomer()
+		static tradingAccountFeedEntry GetCustomer(string userName, string password)
 		{
 			// Look up the first customer record 
 			SDataUri accountUri = new SDataUri();
@@ -97,8 +101,8 @@ namespace PriceCheck
             SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             tradingAccountFeed accounts = new tradingAccountFeed();
@@ -123,7 +127,7 @@ namespace PriceCheck
             }
 		}
 
-		static commodityFeedEntry GetCommodity()
+		static commodityFeedEntry GetCommodity(string userName, string password)
 		{
 			// Look up the first commodity (product) record 
 			SDataUri commodityUri = new SDataUri();
@@ -132,8 +136,8 @@ namespace PriceCheck
 
             SDataRequest commodityRequest = new SDataRequest(commodityUri.Uri)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             commodityFeed commodities = new commodityFeed();

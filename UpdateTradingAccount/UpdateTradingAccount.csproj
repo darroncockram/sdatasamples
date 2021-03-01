@@ -63,6 +63,10 @@
       <Project>{025D396F-E0D5-4415-96BB-D0C8F61D897E}</Project>
       <Name>FeedModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Helpers\Helpers.csproj">
+      <Project>{6f4364ff-ea51-4ffc-96f0-a3354c380f2c}</Project>
+      <Name>Helpers</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

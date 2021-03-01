@@ -4,6 +4,7 @@ using System.Text;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Common.Syndication;
 using Sage.Integration.Client;
+using Helpers;
 
 namespace GetTradingAccounts
 {
@@ -11,6 +12,9 @@ namespace GetTradingAccounts
     {
         static void Main(string[] args)
         {
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
+
             // Build the request URI. This example assumes that the Accounts 50 GCRM contract implementation is available
             SDataUri uri = new SDataUri();
             uri.BuildLocalPath("Accounts50", "GCRM", "-", "tradingAccounts");
@@ -21,8 +25,8 @@ namespace GetTradingAccounts
             SDataRequest request = new SDataRequest(uri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty,
+                Username = userName,
+                Password = password,
                 ResponseContentType = Sage.Common.Syndication.MediaType.JSON
             };
 

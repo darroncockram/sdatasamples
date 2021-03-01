@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Helpers;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
@@ -13,11 +14,14 @@ namespace CreatePurchaseOrder
 	{
 		static void Main(string[] args)
 		{
-            // Create a new instance of a purchaseOrder
-            purchaseOrderFeedEntry purchaseOrder = new purchaseOrderFeedEntry
+			string userName = Authentication.GetUserName();
+			string password = Authentication.GetPassword();
+
+			// Create a new instance of a purchaseOrder
+			purchaseOrderFeedEntry purchaseOrder = new purchaseOrderFeedEntry
             {
                 // Find a customer to associate with the new sales Order
-                tradingAccount = GetSupplier(),
+                tradingAccount = GetSupplier(userName, password),
                 deliveryDate = DateTime.UtcNow.AddDays(-7),
                 date = DateTime.UtcNow.AddDays(-7),
                 dueDate = DateTime.UtcNow.AddDays(-7)
@@ -32,7 +36,7 @@ namespace CreatePurchaseOrder
 			}
 
 			// Lookup a commodity to use on the new sales Order
-			commodityFeedEntry commodity = GetCommodity();
+			commodityFeedEntry commodity = GetCommodity(userName, password);
 			if (commodity == null)
 			{
 				// No commodity record means we go no further
@@ -46,7 +50,7 @@ namespace CreatePurchaseOrder
             };
 
             // Lookup a tax code to use on the new sales Order
-            taxCodeFeedEntry taxCode = GetTaxCode();
+            taxCodeFeedEntry taxCode = GetTaxCode(userName, password);
 			if (taxCode == null)
 			{
 				// No record means we go no further
@@ -88,8 +92,8 @@ namespace CreatePurchaseOrder
 			purchaseOrderUri.Include = "purchaseOrderLines";
             SDataRequest OrderRequest = new SDataRequest(purchaseOrderUri.Uri, purchaseOrder, Sage.Integration.Messaging.Model.RequestVerb.POST)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             // IF successful the POST operation will provide us with a the newly created sales Order
@@ -114,7 +118,7 @@ namespace CreatePurchaseOrder
 			Console.ReadKey(true);
 		}
 
-		static tradingAccountFeedEntry GetSupplier()
+		static tradingAccountFeedEntry GetSupplier(string userName, string password)
 		{
 			// Look up the first customer record 
 			SDataUri accountUri = new SDataUri();
@@ -125,8 +129,8 @@ namespace CreatePurchaseOrder
             SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             tradingAccountFeed accounts = new tradingAccountFeed();
@@ -149,7 +153,7 @@ namespace CreatePurchaseOrder
 			}
 		}
 
-		static commodityFeedEntry GetCommodity()
+		static commodityFeedEntry GetCommodity(string userName, string password)
 		{
 			// Look up the first commodity (product) record 
 			SDataUri commodityUri = new SDataUri();
@@ -158,8 +162,8 @@ namespace CreatePurchaseOrder
 
             SDataRequest commodityRequest = new SDataRequest(commodityUri.Uri)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             commodityFeed commodities = new commodityFeed();
@@ -184,7 +188,7 @@ namespace CreatePurchaseOrder
             }
 		}
 
-		static taxCodeFeedEntry GetTaxCode()
+		static taxCodeFeedEntry GetTaxCode(string userName, string password)
 		{
 			// Look up the tax code record 
 			SDataUri taxCodeUri = new SDataUri();
@@ -193,8 +197,8 @@ namespace CreatePurchaseOrder
 
             SDataRequest taxcodeRequest = new SDataRequest(taxCodeUri.Uri)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             taxCodeFeed taxcodes = new taxCodeFeed();

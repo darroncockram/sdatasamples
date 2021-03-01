@@ -5,6 +5,7 @@ using Sage.Integration.Client;
 using Sage.crmErp.x2008.Feeds;
 using Sage.sc.x2009.Feeds;
 using Sage.Common.Syndication;
+using Helpers;
 
 namespace DeleteTradingAccount
 {
@@ -12,17 +13,18 @@ namespace DeleteTradingAccount
     {
         static void Main(string[] args)
         {
-            // Get a customer to attempt to delete
-            //tradingAccountFeedEntry account = GetCustomer();
+            string userName = Authentication.GetUserName();
+            string password = Authentication.GetPassword();
 
-			postalAddressFeedEntry account = GetAddress();
+            // Get a customer to attempt to delete
+            tradingAccountFeedEntry account = GetCustomer(userName, password);
 
             // Build an Sdata request from the trading account URI
             SDataRequest deleteRequest = new SDataRequest(new Uri(account.Uri), Sage.Integration.Messaging.Model.RequestVerb.DELETE)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = string.Empty
+                Username = userName,
+                Password = password
             };
 
             deleteRequest.Send();
@@ -44,42 +46,7 @@ namespace DeleteTradingAccount
         }
 
 
-		static postalAddressFeedEntry GetAddress()
-		{
-			// Look up the first customer record 
-			SDataUri accountUri = new SDataUri();
-			accountUri.BuildLocalPath("Accounts50", "GCRM", "-", "postalAddresses");
-			accountUri.Where = "name eq 'Customer Delivery Address'";
-			accountUri.Count = 1;
-
-            SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
-            {
-                Username = "MANAGER",
-                Password = ""
-            };
-
-            postalAddressFeed accounts = new postalAddressFeed();
-			accountRequest.RequestFeed<postalAddressFeedEntry>(accounts);
-
-            // If we found a customer record return it
-            if (accountRequest.IsStatusValidForVerb && accounts.Entries != null && accounts.Entries.Count > 0)
-            {
-                return accounts.Entries[0];
-            }
-            else
-            {
-                // There was a problem
-                Console.WriteLine("Account lookup failed. Response was {0}", accountRequest.HttpStatusCode.ToString());
-                foreach (Diagnosis diagnosis in accountRequest.Diagnoses)
-                {
-                    Console.WriteLine(diagnosis.Message);
-                }
-
-                return null;
-            }
-		}
-
-        static tradingAccountFeedEntry GetCustomer()
+        static tradingAccountFeedEntry GetCustomer(string userName, string password)
         {
             // Look up the first customer record 
             SDataUri accountUri = new SDataUri();
@@ -89,8 +56,8 @@ namespace DeleteTradingAccount
 
             SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             tradingAccountFeed accounts = new tradingAccountFeed();

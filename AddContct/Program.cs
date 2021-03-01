@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Helpers;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
@@ -11,11 +12,14 @@ namespace CreateSalesInvoice
 	{
 		static void Main(string[] args)
 		{
+			string userName = Authentication.GetUserName();
+			string password = Authentication.GetPassword();
+
 			// Create a new instance of a contactFeedEntry
 			contactFeedEntry contact = new contactFeedEntry();
 
 			// Find a customer to associate with the new sales invoice
-			tradingAccountFeedEntry tradingAccount = GetCustomer();
+			tradingAccountFeedEntry tradingAccount = GetCustomer(userName, password);
 
 			if (tradingAccount == null)
 			{
@@ -37,8 +41,8 @@ namespace CreateSalesInvoice
 
             SDataRequest request = new SDataRequest(salesInvoiceUri.Uri, contact, Sage.Integration.Messaging.Model.RequestVerb.POST)
             {
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             // If successful the POST operation will provide us with a the newly created sales invoice
@@ -65,7 +69,7 @@ namespace CreateSalesInvoice
 			Console.ReadKey(true);
 		}
 
-		static tradingAccountFeedEntry GetCustomer()
+		static tradingAccountFeedEntry GetCustomer(string userName, string password)
 		{
 			// Look up the first customer record 
 			SDataUri accountUri = new SDataUri();
@@ -76,8 +80,8 @@ namespace CreateSalesInvoice
             SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
             {
                 AllowPromptForCredentials = false,
-                Username = "MANAGER",
-                Password = ""
+                Username = userName,
+                Password = password
             };
 
             tradingAccountFeed accounts = new tradingAccountFeed();
