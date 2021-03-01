@@ -38,7 +38,6 @@ namespace GetInstanceSchema
             if (request.IsStatusValidForVerb)
             {
                 // The response was successful. The stream should now contain the xml schema
-                XmlSchemaSet schemaSet = new XmlSchemaSet();
                 XmlSchema schema = XmlSchema.Read(stream, new ValidationEventHandler(XmlSchema_Validation));
 
                 // Display a list of the elements in the schema
