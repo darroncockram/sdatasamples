@@ -40,8 +40,6 @@ namespace GetInstanceSchema
                 // The response was successful. The stream should now contain the xml schema
                 XmlSchemaSet schemaSet = new XmlSchemaSet();
                 XmlSchema schema = XmlSchema.Read(stream, new ValidationEventHandler(XmlSchema_Validation));
-                schemaSet.Add(schema);
-                schemaSet.Compile();
 
                 // Display a list of the elements in the schema
                 foreach (XmlSchemaElement element in schema.Elements.Values)
