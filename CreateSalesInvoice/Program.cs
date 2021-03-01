@@ -4,6 +4,7 @@ using System.Text;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
+using System.Linq;
 
 namespace CreateSalesInvoice
 {
@@ -11,11 +12,20 @@ namespace CreateSalesInvoice
 	{
 		static void Main(string[] args)
 		{
+			Console.WriteLine("Enter the user name to connect to the data (default is MANAGER):");
+			string userName = Console.ReadLine();
+			if (String.IsNullOrEmpty(userName))
+			{
+				userName = "MANAGER";
+			}
+
+			string password = GetPassword();
+
 			// Create a new instance of a salesInvoice
 			salesInvoiceFeedEntry salesInvoice = new salesInvoiceFeedEntry
 			{
 				// Find a customer to associate with the new sales invoice
-				tradingAccount = GetCustomer()
+				tradingAccount = GetCustomer(userName, password)
 			};
 
 			if (salesInvoice.tradingAccount == null)
@@ -27,7 +37,7 @@ namespace CreateSalesInvoice
 			}
 
 			// Lookup a commodity to use on the new sales invoice
-			commodityFeedEntry commodity = GetCommodity();
+			commodityFeedEntry commodity = GetCommodity(userName, password);
 			if(commodity == null)
 			{
 				// No commodity record means we go no further
@@ -41,28 +51,33 @@ namespace CreateSalesInvoice
 			};
 
 			// Lookup a commodity to use on the new sales invoice
-			taxCodeFeedEntry taxCode = GetTaxCode();
-			if (taxCode == null)
+			var taxCodes = GetTaxCodes(userName, password);
+			taxCodeFeedEntry taxCodeT0 = taxCodes.SingleOrDefault(t => t.reference == "T0");
+			taxCodeFeedEntry taxCodeT1 = taxCodes.SingleOrDefault(t => t.reference == "T1");
+
+			if (taxCodeT0 == null || taxCodeT1 == null)
 			{
 				// No record means we go no further
-				Console.WriteLine("Unable to find a tax code record");
+				Console.WriteLine("Unable to find tax code records");
 				Console.ReadKey(true);
 				return;
 			}
 
+			taxCodeFeedEntry taxReferenceT0 = new taxCodeFeedEntry
+			{
+				UUID = taxCodeT0.UUID
+			};
+
+			taxCodeFeedEntry taxReferenceT1 = new taxCodeFeedEntry
+			{
+				UUID = taxCodeT1.UUID
+			};
+
 			// Example of creating a historical invoice
 			//salesInvoice.date = salesInvoice.taxDate = DateTime.UtcNow.AddDays(-2);
 
-			// NOTE: This example omits the use of tax code for brevity.
-			// Not specifying tax codes means that appropriate defaults will be used automatically.
-			// However it is strongly recommended that tax codes are explicitly set to ensure expected results
-			taxCodeFeedEntry taxReference = new taxCodeFeedEntry
-			{
-				UUID = taxCode.UUID
-			};
-
 			salesInvoice.taxCodes = new taxCodeFeed();
-			salesInvoice.taxCodes.Entries.Add(taxReference);
+			salesInvoice.taxCodes.Entries.Add(taxReferenceT0);
 
 			salesInvoice.carrierTotalPrice = 100;
 			salesInvoice.carrierTaxPrice = 20;
@@ -80,35 +95,68 @@ namespace CreateSalesInvoice
 				netTotal = 50,
 				taxTotal = 10,
 				grossTotal = 60,
+				actualPrice = 25,
 				taxCodes = new taxCodeFeed()
 			};
-			invoiceLine.taxCodes.Entries.Add(taxReference);
+			invoiceLine.taxCodes.Entries.Add(taxReferenceT1);
 
 			// Create another invoice line this time as free text
 			salesInvoiceLineFeedEntry freetextOrderLine = new salesInvoiceLineFeedEntry
 			{
-				type = "Free Text", // Equivalent to S1 stock code
-				text = "An example product",
+				type = "Free Text", // Equivalent to S1 stock code by default. To use S2/S3 set the reference - see below
+				text = "An example S1 special product",
 				quantity = 5,
 				netTotal = 100,
 				taxTotal = 20,
 				grossTotal = 120,
+				actualPrice = 20,
 				taxCodes = new taxCodeFeed()
 			};
-			freetextOrderLine.taxCodes.Entries.Add(taxReference);
+			freetextOrderLine.taxCodes.Entries.Add(taxReferenceT1);
 
-			// Create a 3rd invoice line this time as a message
+			// Create another invoice line this time as special product S2
+			salesInvoiceLineFeedEntry freetextOrderLineS2 = new salesInvoiceLineFeedEntry
+			{
+				type = "Free Text",
+				reference = "S2",
+				text = "An example S2 special product",
+				quantity = 5,
+				netTotal = 100,
+				taxTotal = 0,
+				grossTotal = 100,
+				actualPrice = 20,
+				taxCodes = new taxCodeFeed()
+			};
+			freetextOrderLineS2.taxCodes.Entries.Add(taxReferenceT0);
+
+			// Create another invoice line this time as special product S3
+			salesInvoiceLineFeedEntry freetextOrderLineS3 = new salesInvoiceLineFeedEntry
+			{
+				type = "Free Text",
+				reference = "S3",
+				text = "An example S3 special product",
+				quantity = 5,
+				netTotal = 100,
+				taxTotal = 20,
+				grossTotal = 120,
+				actualPrice = 20, 
+				taxCodes = new taxCodeFeed()
+			};
+			freetextOrderLineS3.taxCodes.Entries.Add(taxReferenceT1);
+
+			// Create another line this time as a message
 			salesInvoiceLineFeedEntry messageOrderLine = new salesInvoiceLineFeedEntry
 			{
 				type = "Commentary", // Equivalent to M stock code
 				text = "A message line created via Sdata"
 			};
 
-
 			// Associate the lines with our invoice
 			salesInvoice.salesInvoiceLines = new salesInvoiceLineFeed();
 			salesInvoice.salesInvoiceLines.Entries.Add(invoiceLine);
 			salesInvoice.salesInvoiceLines.Entries.Add(freetextOrderLine);
+			salesInvoice.salesInvoiceLines.Entries.Add(freetextOrderLineS2);
+			salesInvoice.salesInvoiceLines.Entries.Add(freetextOrderLineS3);
 			salesInvoice.salesInvoiceLines.Entries.Add(messageOrderLine);
 
 			// Now we have constructed our new invoice we can submit it using the HTTP POST verb  
@@ -117,11 +165,11 @@ namespace CreateSalesInvoice
 
 			SDataRequest invoiceRequest = new SDataRequest(salesInvoiceUri.Uri, salesInvoice, Sage.Integration.Messaging.Model.RequestVerb.POST)
 			{
-				Username = "MANAGER",
-				Password = ""
+				Username = userName,
+				Password = password
 			};
 
-			// IF successful the POST operation will provide us with a the newly created sales invoice
+			// If successful the POST operation will provide us with a the newly created sales invoice
 			salesInvoiceFeedEntry savedSalesInvoice = new salesInvoiceFeedEntry();
 			invoiceRequest.RequestFeedEntry<salesInvoiceFeedEntry>(savedSalesInvoice);
 
@@ -145,7 +193,23 @@ namespace CreateSalesInvoice
 			Console.ReadKey(true);
 		}
 
-		static tradingAccountFeedEntry GetCustomer()
+		private static string GetPassword()
+		{
+			Console.WriteLine($"Enter the password for the above user");
+			var password = "";
+			ConsoleKeyInfo ch = Console.ReadKey(true);
+			while (ch.Key != ConsoleKey.Enter)
+			{
+				password += ch.KeyChar;
+				Console.Write('*');
+				ch = Console.ReadKey(true);
+			}
+			Console.WriteLine();
+
+			return password;
+		}
+
+		static tradingAccountFeedEntry GetCustomer(string userName, string password)
 		{
 			// Look up the first customer record 
 			SDataUri accountUri = new SDataUri();
@@ -156,8 +220,8 @@ namespace CreateSalesInvoice
 			SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
 			{
 				AllowPromptForCredentials = false,
-				Username = "MANAGER",
-				Password = ""
+				Username = userName,
+				Password = password
 			};
 
 			tradingAccountFeed accounts = new tradingAccountFeed();
@@ -182,7 +246,7 @@ namespace CreateSalesInvoice
 			}
 		}
 
-		static commodityFeedEntry GetCommodity()
+		static commodityFeedEntry GetCommodity(string userName, string password)
 		{
 			// Look up the first commodity (product) record 
 			SDataUri commodityUri = new SDataUri();
@@ -191,8 +255,8 @@ namespace CreateSalesInvoice
 
 			SDataRequest commodityRequest = new SDataRequest(commodityUri.Uri)
 			{
-				Username = "MANAGER",
-				Password = ""
+				Username = userName,
+				Password = password
 			};
 
 			commodityFeed commodities = new commodityFeed();
@@ -217,17 +281,17 @@ namespace CreateSalesInvoice
 			}
 		}
 
-		static taxCodeFeedEntry GetTaxCode()
+		static FeedEntryCollection<taxCodeFeedEntry> GetTaxCodes(string userName, string password)
 		{
 			// Look up the tax code record 
 			SDataUri taxCodeUri = new SDataUri();
 			taxCodeUri.BuildLocalPath("Accounts50", "GCRM", "-", "taxCodes");
-			taxCodeUri.Where = "reference eq 'T1'";
+			taxCodeUri.Where = "reference eq 'T0' or reference eq 'T1'";
 
 			SDataRequest taxcodeRequest = new SDataRequest(taxCodeUri.Uri)
 			{
-				Username = "MANAGER",
-				Password = ""
+				Username = userName,
+				Password = password
 			};
 
 			taxCodeFeed taxcodes = new taxCodeFeed();
@@ -236,7 +300,7 @@ namespace CreateSalesInvoice
 			// If we found a customer record return it
 			if (taxcodeRequest.IsStatusValidForVerb && taxcodes.Entries != null && taxcodes.Entries.Count > 0)
 			{
-				return taxcodes.Entries[0];
+				return taxcodes.Entries;
 			}
 			else
 			{
