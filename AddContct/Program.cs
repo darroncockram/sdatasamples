@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Helpers;
 using Sage.Common.Syndication;
 using Sage.crmErp.x2008.Feeds;
 using Sage.Integration.Client;
+using Sage.sc.x2009.Feeds;
 
 namespace CreateSalesInvoice
 {
@@ -33,20 +34,28 @@ namespace CreateSalesInvoice
 			contact.familyName = "Person";
 			contact.tradingAccount = new tradingAccountFeedEntry() { UUID = tradingAccount.UUID };
 			contact.type = "Customer Delivery Contact";
-			
-			
+
+			// Optionally we can add an email
+			// NOTE: Although contact.emails could contain multiple emails Sage 50 Accounts does not support multiple emails for a single contact
+			contact.emails = new emailFeed();
+			emailFeedEntry email = new emailFeedEntry()
+			{
+				address = "demo@sage.com"
+			};
+			contact.emails.Entries.Add(email);
+
 			// Now we have constructed our new invoice we can submit it using the HTTP POST verb  
 			SDataUri salesInvoiceUri = new SDataUri();
 			salesInvoiceUri.BuildLocalPath("Accounts50", "GCRM", "-", "contacts");
 
-            SDataRequest request = new SDataRequest(salesInvoiceUri.Uri, contact, Sage.Integration.Messaging.Model.RequestVerb.POST)
-            {
-                Username = userName,
-                Password = password
-            };
+			SDataRequest request = new SDataRequest(salesInvoiceUri.Uri, contact, Sage.Integration.Messaging.Model.RequestVerb.POST)
+			{
+				Username = userName,
+				Password = password
+			};
 
-            // If successful the POST operation will provide us with a the newly created sales invoice
-            contactFeedEntry savedContact = new contactFeedEntry();
+			// If successful the POST operation will provide us with a the newly created sales invoice
+			contactFeedEntry savedContact = new contactFeedEntry();
 			request.RequestFeedEntry<contactFeedEntry>(savedContact);
 
 			if (request.IsStatusValidForVerb)
@@ -59,10 +68,10 @@ namespace CreateSalesInvoice
 				Console.WriteLine("Create failed. Response was {0}", request.HttpStatusCode.ToString());
 				if (request.Diagnoses != null)
 				{
-                    foreach (Diagnosis diagnosis in request.Diagnoses)
-                    {
-                        Console.WriteLine(diagnosis.Message);
-                    }
+					foreach (Diagnosis diagnosis in request.Diagnoses)
+					{
+                        			Console.WriteLine(diagnosis.Message);
+					}
 				}
 			}
 
@@ -77,33 +86,33 @@ namespace CreateSalesInvoice
 			accountUri.Where = "customerSupplierFlag eq 'Customer'";
 			accountUri.Count = 1;
 
-            SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
-            {
-                AllowPromptForCredentials = false,
-                Username = userName,
-                Password = password
-            };
+			SDataRequest accountRequest = new SDataRequest(accountUri.Uri)
+			{
+                		AllowPromptForCredentials = false,
+               			Username = userName,
+                		Password = password
+			};
 
-            tradingAccountFeed accounts = new tradingAccountFeed();
+			tradingAccountFeed accounts = new tradingAccountFeed();
 			accountRequest.RequestFeed<tradingAccountFeedEntry>(accounts);
 
-            // If we found a customer record return it
-            if (accountRequest.IsStatusValidForVerb && accounts.Entries != null && accounts.Entries.Count > 0)
-            {
-                return accounts.Entries[0];
-            }
-            else
-            {
-                // There was a problem
-                Console.WriteLine("Account lookup failed. Response was {0}", accountRequest.HttpStatusCode.ToString());
-                if (accountRequest.Diagnoses != null)
-                {
-                    foreach (Diagnosis diagnosis in accountRequest.Diagnoses)
-                        Console.WriteLine(diagnosis.Message);
-                }
+			// If we found a customer record return it
+			if (accountRequest.IsStatusValidForVerb && accounts.Entries != null && accounts.Entries.Count > 0)
+			{
+               			return accounts.Entries[0];
+			}
+			else
+			{
+                		// There was a problem
+                		Console.WriteLine("Account lookup failed. Response was {0}", accountRequest.HttpStatusCode.ToString());
+                		if (accountRequest.Diagnoses != null)
+               			{
+                    			foreach (Diagnosis diagnosis in accountRequest.Diagnoses)
+                        			Console.WriteLine(diagnosis.Message);
+                		}
 
-                return null;
-            }
+                		return null;
+			}
 		}
 	}
 }
